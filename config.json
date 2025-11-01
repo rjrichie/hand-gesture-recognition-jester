@@ -1,0 +1,28 @@
+{
+  "data": {
+    "raw_data_path": "data/raw",
+    "processed_data_path": "data/processed",
+    "interim_data_path": "data/interim",
+    "frame_height": 224,
+    "frame_width": 224,
+    "num_frames": 16
+  },
+  "training": {
+    "batch_size": 32,
+    "num_epochs": 100,
+    "learning_rate": 0.001,
+    "optimizer": "adam",
+    "loss_function": "cross_entropy"
+  },
+  "model": {
+    "architecture": "resnet3d",
+    "pretrained": true,
+    "num_classes": 27
+  },
+  "augmentation": {
+    "horizontal_flip": true,
+    "rotation_range": 10,
+    "brightness_range": [0.8, 1.2],
+    "zoom_range": [0.9, 1.1]
+  }
+}

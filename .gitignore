@@ -205,3 +205,53 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# macOS
+*.DS_Store
+.AppleDouble
+.LSOverride
+
+# Deep Learning
+# Model checkpoints and weights
+*.h5
+*.hdf5
+*.pb
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+checkpoints/
+saved_models/
+models/weights/
+
+# TensorBoard logs
+logs/
+runs/
+tensorboard/
+
+# Dataset directories (often large)
+data/raw/
+data/processed/
+data/interim/
+datasets/
+*.csv
+*.tsv
+
+# Trained model outputs
+outputs/
+results/
+predictions/
+
+# Weights & Biases
+wandb/
+
+# MLflow
+mlruns/
+
+# DVC (Data Version Control)
+.dvc
+*.dvc
+
+# Experiment tracking
+experiments/
+trials/
