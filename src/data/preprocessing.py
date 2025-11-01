@@ -7,7 +7,7 @@ for the Jester hand gesture dataset.
 
 import os
 from pathlib import Path
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Any
 
 
 class VideoPreprocessor:
