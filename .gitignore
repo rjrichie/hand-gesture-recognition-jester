@@ -230,12 +230,17 @@ runs/
 tensorboard/
 
 # Dataset directories (often large)
-data/raw/
-data/processed/
-data/interim/
+data/raw/*
+data/processed/*
+data/interim/*
 datasets/
 *.csv
 *.tsv
+
+# But keep directory structure
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!data/interim/.gitkeep
 
 # Trained model outputs
 outputs/
