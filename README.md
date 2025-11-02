@@ -14,7 +14,7 @@ Create a virtual environment:
 
 ```bash
 uv venv
-source venv/bin/activate    # macOS/Linux
+source .venv/bin/activate    # macOS/Linux
 venv\Scripts\activate       # Windows
 ```
 
