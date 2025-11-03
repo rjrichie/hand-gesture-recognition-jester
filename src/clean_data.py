@@ -59,7 +59,7 @@ filtered_train_df = filtered_train_df[filtered_train_df['label'].isin(classes_to
 filtered_test_df = filtered_test_df[filtered_test_df['label'].isin(classes_to_keep)]
 filtered_val_df = filtered_val_df[filtered_val_df['label'].isin(classes_to_keep)]
 
-# Reduce each class size to 1000 for testing, 300 for testing and 30 for validation (randomly)
+# Reduce each class size to 1000 for training, 300 for testing and 30 for validation (randomly)
 reduced_train_df = filtered_train_df.groupby('label').sample(n=1000, random_state=random_seed)
 reduced_test_df = filtered_test_df.groupby('label').sample(n=300, random_state=random_seed)
 reduced_val_df = filtered_val_df.groupby('label').sample(n=30, random_state=random_seed)

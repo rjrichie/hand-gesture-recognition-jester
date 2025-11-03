@@ -29,11 +29,17 @@ class JesterDataset(torch.utils.data.Dataset):
         
         gesture_dir = str(item_data['gesture_dir'])
         label = int(item_data['label'])
+        mapping = {7:0, 8:1, 9:2, 10:3, 17:4, 20:5, 24:6, 26:7, 27:8}
+        label = mapping[label]
 
         folder_path = os.path.join(self.root_dir, gesture_dir)
 
         # Get sorted list of frames
-        frame_paths = sorted([os.path.join(folder_path, f) for f in os.listdir(folder_path) if f.endswith('.jpg')])
+        frame_paths = sorted([
+            os.path.join(folder_path, f)
+            for f in os.listdir(folder_path)
+            if f.endswith('.jpg') and not f.startswith('._')
+        ])
 
         # Uniformly sample num_frames
         total_frames = int(item_data['num_frames'])
