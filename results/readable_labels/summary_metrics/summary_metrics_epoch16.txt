@@ -1,0 +1,6 @@
+=== EPOCH 16 EVALUATION SUMMARY ===
+Validation Loss     : 0.4777
+Validation Accuracy : 87.04%
+==========================
+
+Per-Class Metrics (see CSV for details)

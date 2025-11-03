@@ -1,0 +1,6 @@
+=== EPOCH 15 EVALUATION SUMMARY ===
+Validation Loss     : 0.3791
+Validation Accuracy : 86.30%
+==========================
+
+Per-Class Metrics (see CSV for details)

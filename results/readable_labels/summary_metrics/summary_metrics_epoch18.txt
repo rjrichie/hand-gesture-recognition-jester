@@ -1,0 +1,6 @@
+=== EPOCH 18 EVALUATION SUMMARY ===
+Validation Loss     : 0.3790
+Validation Accuracy : 88.89%
+==========================
+
+Per-Class Metrics (see CSV for details)
