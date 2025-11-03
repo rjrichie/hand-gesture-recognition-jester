@@ -14,6 +14,8 @@ class JesterDataset(torch.utils.data.Dataset):
         """
         import pandas as pd
         self.data = pd.read_csv(csv_file)
+        uniq = sorted(self.data['label'].unique().tolist())
+        self.label2id = {lab:i for i, lab in enumerate(uniq)}
         self.root_dir = root_dir
         self.num_frames = num_frames
         self.transform = transform or torchvision.transforms.Compose([
@@ -28,9 +30,8 @@ class JesterDataset(torch.utils.data.Dataset):
         item_data = self.data.iloc[idx]
         
         gesture_dir = str(item_data['gesture_dir'])
-        label = int(item_data['label'])
-        mapping = {7:0, 8:1, 9:2, 10:3, 17:4, 20:5, 24:6, 26:7, 27:8}
-        label = mapping[label]
+        label = self.label2id[int(item_data['label'])]
+        label = torch.tensor(label, dtype=torch.long)
 
         folder_path = os.path.join(self.root_dir, gesture_dir)
 
