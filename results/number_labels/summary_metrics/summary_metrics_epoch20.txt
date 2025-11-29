@@ -1,6 +1,0 @@
-=== EPOCH 20 EVALUATION SUMMARY ===
-Validation Loss     : 0.5449
-Validation Accuracy : 87.41%
-==========================
-
-Per-Class Metrics (see CSV for details)

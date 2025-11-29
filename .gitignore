@@ -211,3 +211,5 @@ __marimo__/
 
 # Custom
 /dataset/*/data/*
+/dataset/*/data.tar
+/checkpoints/*

@@ -1,6 +1,0 @@
-=== EPOCH 19 EVALUATION SUMMARY ===
-Validation Loss     : 0.4965
-Validation Accuracy : 87.04%
-==========================
-
-Per-Class Metrics (see CSV for details)
