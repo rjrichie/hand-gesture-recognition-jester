@@ -12,6 +12,8 @@ from tqdm import tqdm
 
 from data_processing.jester_dataset import JesterDataset
 from models.CNN3D import C3D
+from models.CLSTM import CLSTM
+from models.R2plus1D import R2plus1D
 
 
 def setup_ddp():
@@ -38,6 +40,12 @@ def get_model(model_type, sample_size, sample_duration, num_classes):
     """Create model based on model type."""
     if model_type == "c3d":
         return C3D(sample_size=sample_size, sample_duration=sample_duration, num_classes=num_classes)
+    elif model_type == "clstm":
+        return CLSTM(sample_size=sample_size, sample_duration=sample_duration, num_classes=num_classes)
+    elif model_type == "r2plus1d":
+        return R2plus1D(sample_size=sample_size, sample_duration=sample_duration, num_classes=num_classes)
+    elif model_type == "r2plus1d_pretrained":
+        return R2plus1D(sample_size=sample_size, sample_duration=sample_duration, num_classes=num_classes, pretrained=True)
     else:
         raise ValueError(f"Unknown model type: {model_type}")
 
@@ -46,8 +54,12 @@ def load_checkpoint(checkpoint_dir, model, optimizer, rank, model_type, sample_s
     """Load latest checkpoint if available and validate configuration."""
     if not os.path.exists(checkpoint_dir):
         return 1, None
-        
-    checkpoint_files = [f for f in os.listdir(checkpoint_dir) if f.endswith(".pth")]
+    
+    prefix = f"{model_type}_epoch"
+    checkpoint_files = [
+        f for f in os.listdir(checkpoint_dir) 
+        if f.endswith(".pth") and f.startswith(prefix)
+    ]
     if not checkpoint_files:
         return 1, None
     
@@ -167,13 +179,15 @@ def main():
     parser = argparse.ArgumentParser(description="Train gesture recognition model with DDP (use torchrun)")
 
     # Model parameters
-    parser.add_argument("--model_type", type=str, default="c3d", choices=["c3d"])
+    parser.add_argument("--model_type", type=str, default="c3d", choices=["c3d", "clstm", "r2plus1d", "r2plus1d_pretrained"],
+                       help="Model architecture to use")
     
     # Training parameters
     parser.add_argument("--batch_size", type=int, default=4, 
-                       help="Batch size per GPU")
+                       help="Batch size per GPU (recommend 8-16 for CLSTM, 4 for C3D)")
     parser.add_argument("--num_epochs", type=int, default=20)
-    parser.add_argument("--learning_rate", type=float, default=1e-4)
+    parser.add_argument("--learning_rate", type=float, default=1e-4,
+                       help="Learning rate (recommend 1e-4 for scratch)")
     parser.add_argument("--checkpoint_dir", type=str, default="checkpoints")
     parser.add_argument("--num_workers", type=int, default=2,
                        help="Number of DataLoader workers per GPU")
@@ -189,6 +203,7 @@ def main():
         print(f"\n{'='*60}")
         print(f"Training Configuration:")
         print(f"{'='*60}")
+        print(f"Model type:              {args.model_type.upper()}")
         print(f"World Size (GPUs):       {world_size}")
         print(f"Batch size per GPU:      {args.batch_size}")
         print(f"Effective batch size:    {args.batch_size * world_size}")
@@ -385,3 +400,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# uv run torchrun --nproc_per_node=4 src/train.py --model_type clstm  --batch_size 32 --num_workers 4
+# uv run torchrun --nproc_per_node=4 src/train.py --model_type r2plus1d  --batch_size 32 --num_workers 4
