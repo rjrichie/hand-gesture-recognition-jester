@@ -13,6 +13,8 @@ from tqdm import tqdm
 
 from data_processing.jester_dataset import JesterDataset
 from models.CNN3D import C3D
+from models.CLSTM import CLSTM
+from models.R2plus1D import R2plus1D
 
 
 CLASS_MAPPING = {
@@ -29,9 +31,17 @@ CLASS_MAPPING = {
 
 
 def get_model(model_type, sample_size, sample_duration, num_classes):
+    """Create model based on model type."""
     if model_type == "c3d":
         return C3D(sample_size=sample_size, sample_duration=sample_duration, num_classes=num_classes)
-    raise ValueError(f"Unknown model type: {model_type}")
+    elif model_type == "clstm":
+        return CLSTM(sample_size=sample_size, sample_duration=sample_duration, num_classes=num_classes)
+    elif model_type == "r2plus1d":
+        return R2plus1D(sample_size=sample_size, sample_duration=sample_duration, num_classes=num_classes)
+    elif model_type == "r2plus1d_pretrained":
+        return R2plus1D(sample_size=sample_size, sample_duration=sample_duration, num_classes=num_classes, pretrained=True)
+    else:
+        raise ValueError(f"Unknown model type: {model_type}")
 
 
 def count_parameters(model):
@@ -153,7 +163,7 @@ def main():
     parser.add_argument("--checkpoint_path", type=str, required=True)
     parser.add_argument("--csv_file", type=str, required=True, 
                        help="CSV file name (val or test)")
-    parser.add_argument("--model_type", type=str, default="c3d", choices=["c3d"])
+    parser.add_argument("--model_type", type=str, default="c3d", choices=["c3d", "clstm", "r2plus1d", "r2plus1d_pretrained"])
     parser.add_argument("--batch_size", type=int, default=4)
     parser.add_argument("--num_inference_runs", type=int, default=100,
                        help="Number of iterations for inference timing")
@@ -197,7 +207,7 @@ def main():
     print(f"Non-trainable parameters: {param_counts['non_trainable']:,}")
     print(f"Model size (MB):        {param_counts['total'] * 4 / (1024**2):.2f}")  # Assuming float32
     
-    # Measure inference time with batch size 1
+    # Measure inference time with batch size 1 on cpu
     print("\n" + "="*60)
     print("Measuring Inference Time (batch_size=1):")
     print("="*60)
@@ -217,6 +227,25 @@ def main():
     print(f"FPS (mean):             {1000 / inference_stats['mean_ms']:.2f}")
 
     testing_model = load_model(args.checkpoint_path, args.model_type, sample_size, num_frames, num_classes, testing_device)
+
+    # Measure inference time with batch size 1 on mps
+    print("\n" + "="*60)
+    print("Measuring Inference Time (batch_size=1):")
+    print("="*60)
+    sample_input_mps = torch.randn(1, 3, num_frames, sample_size, sample_size).to(testing_device)
+    inference_stats_mps = measure_inference_time(
+        testing_model, 
+        sample_input_mps, 
+        testing_device, 
+        num_warmup=10, 
+        num_iterations=args.num_inference_runs
+    )
+    print(f"Mean inference time:    {inference_stats_mps['mean_ms']:.2f} ± {inference_stats_mps['std_ms']:.2f} ms")
+    print(f"Median inference time:  {inference_stats_mps['median_ms']:.2f} ms")
+    print(f"Min inference time:     {inference_stats_mps['min_ms']:.2f} ms")
+    print(f"Max inference time:     {inference_stats_mps['max_ms']:.2f} ms")
+    print(f"Iterations:             {inference_stats_mps['num_iterations']}")
+    print(f"FPS (mean):             {1000 / inference_stats_mps['mean_ms']:.2f}")
     
     # Evaluate
     print("\n" + "="*60)
@@ -248,8 +277,8 @@ def main():
         'class_names': class_names,
         'model_info': {
             'parameters': param_counts,
-            'inference_time': inference_stats,
-            'device': str(inference_device)
+            'inference_cpu': inference_stats,
+            'inference_mps': inference_stats_mps,
         }
     }
     
